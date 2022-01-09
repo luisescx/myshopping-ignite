@@ -1,42 +1,50 @@
-import React from 'react';
-
-import { ButtonIcon } from '../ButtonIcon';
-import { Container, Info, Title, Quantity, Options } from './styles';
+import React from "react";
+import firestore from "@react-native-firebase/firestore";
+import { ButtonIcon } from "../ButtonIcon";
+import { Container, Info, Title, Quantity, Options } from "./styles";
 
 export type ProductProps = {
-  id: string;
-  description: string;
-  quantity: number;
-  done: boolean;
-}
+    id: string;
+    description: string;
+    quantity: number;
+    done: boolean;
+};
 
 type Props = {
-  data: ProductProps;
-}
+    data: ProductProps;
+};
 
 export function Product({ data }: Props) {
-  return (
-    <Container>
-      <Info>
-        <Title done={data.done}>
-          {data.description}
-        </Title>
+    function handleProductDone() {
+        firestore().collection("products").doc(data.id).update({
+            done: !data.done,
+        });
+    }
 
-        <Quantity>
-          Quantidade: {data.quantity}
-        </Quantity>
-      </Info>
+    function handleDeleteProduct() {
+        firestore().collection("products").doc(data.id).delete();
+    }
 
-      <Options>
-        <ButtonIcon
-          icon={data.done ? "undo" : "check"}
-        />
+    return (
+        <Container>
+            <Info>
+                <Title done={data.done}>{data.description}</Title>
 
-        <ButtonIcon
-          icon="delete"
-          color="alert"
-        />
-      </Options>
-    </Container>
-  );
+                <Quantity>Quantidade: {data.quantity}</Quantity>
+            </Info>
+
+            <Options>
+                <ButtonIcon
+                    icon={data.done ? "undo" : "check"}
+                    onPress={handleProductDone}
+                />
+
+                <ButtonIcon
+                    icon="delete"
+                    color="alert"
+                    onPress={handleDeleteProduct}
+                />
+            </Options>
+        </Container>
+    );
 }
